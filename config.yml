@@ -1,0 +1,22 @@
+log_dir: stdout
+log_level: debug
+
+stats:
+  enable: false
+  graphite_host: "vm-edi-graph2"
+  graphite_port: 2003
+  graphite_prefix: DevOps
+
+http:
+  enable: true
+  address: ":8080"
+  elasticsearch:
+    - "http://vm-elastic:9200"
+  sampling: 1
+  replicas:
+    - "http://localhost:8080"
+  min_ttl: 10
+  max_ttl: 120
+
+profiling:
+  enable: true

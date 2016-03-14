@@ -1,6 +1,8 @@
 # Distributed tracing system
 
 [![Gitter](https://badges.gitter.im/ditrace/ditrace.svg)](https://gitter.im/ditrace/ditrace?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Coverage Status](https://coveralls.io/repos/github/ditrace/ditrace/badge.svg?branch=master)](https://coveralls.io/github/ditrace/ditrace?branch=master)
+[![Build Status](https://travis-ci.org/ditrace/ditrace.svg?branch=master)](https://travis-ci.org/ditrace/ditrace)
 
 This is the source code of the DiTrace (distributed tracing system) gate.
 

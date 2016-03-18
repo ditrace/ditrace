@@ -1,6 +1,7 @@
 package dtrace
 
 import (
+	"encoding/json"
 	"fmt"
 	"sync"
 	"sync/atomic"
@@ -112,7 +113,7 @@ func (traceMap TraceMap) Collect(minTTL, maxTTL time.Duration, toES chan *Docume
 			continue
 		}
 		if !trace.Completed {
-			if (trace.Timestamp.Add(maxTTL).After(now)){
+			if trace.Timestamp.Add(maxTTL).After(now) {
 				continue
 			}
 			waste = append(waste, traceID)
@@ -199,9 +200,22 @@ func sendBulk(esClient ESClient, documents []*Document) {
 		atomic.AddInt64(&metrics.FailedESRequests, 1)
 		return
 	}
-	failedTraces := len(res.Failed())
-	atomic.AddInt64(&metrics.FailedESTraces, int64(failedTraces))
-	log.Debugf("Indexed %d, failed %d of %d by %d ms", len(res.Indexed()), failedTraces, len(documents), res.Took)
+
+	failedTraces := res.Failed()
+	atomic.AddInt64(&metrics.FailedESTraces, int64(len(failedTraces)))
+	log.Debugf("Indexed %d, failed %d of %d by %d ms", len(res.Indexed()), len(failedTraces), len(documents), res.Took)
+	for i, res := range failedTraces {
+		if i > 5 {
+			log.Debug("Others response error details are omitted")
+			break
+		}
+		response, err := json.Marshal(res.Error)
+		if err != nil {
+			log.Warningf("Can not decode response error: %s", err)
+			continue
+		}
+		log.Warningf("Fail details #%d: %s", i, string(response))
+	}
 }
 
 type realESClient struct {

@@ -1,10 +1,12 @@
-VERSION := $(shell sh -c 'git describe --always --tags')
+VERSION := $(shell git describe --always --tags --abbrev=0 | tail -c +2)
+RELEASE := $(shell git describe --always --tags | awk -F- '{ if ($$2) dot="."} END { printf "1%s%s%s%s\n",dot,$$2,dot,$$3}')
+VENDOR := "SKB Kontur"
 
 default: prepare test build
 
 build:
 	mkdir -p build/root/usr/bin/ 
-	go build -ldflags "-X main.version=$(VERSION)" -o build/root/usr/bin/ditrace
+	go build -ldflags "-X main.Version=$(VERSION)-$(RELEASE)" -o build/root/usr/bin/ditrace
 
 test: clean prepare
 	go get github.com/onsi/ginkgo/ginkgo
@@ -19,10 +21,11 @@ rpm: build
 		-s "dir" \
 		--description "Distributed system gate" \
 		-C ./build/root/ \
-		--vendor "SKB Kontur" \
+		--vendor $(VENDOR) \
 		--url "https://github.com/ditrace/ditrace" \
 		--name "ditrace" \
 		--version "$(VERSION)" \
+		--iteration "$(RELEASE)" \
 		-p build
 
 clean:

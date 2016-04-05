@@ -20,15 +20,18 @@ func (traceMap TraceMap) Put(span *Span) *Trace {
 	if len(span.ProfileID) > 0 {
 		trace.ProfileID = span.ProfileID
 	}
-	if len(span.System) > 0 {
-		trace.System = span.System
-	}
 	
 	span.Revision = span.revision()
 
 	exSpan := trace.Spans.getOrCreate(span.ID)
 	if len(span.ParentSpanID) > 0 {
 		exSpan.ParentSpanID = span.ParentSpanID
+	}
+	if len(span.System) > 0 {
+		exSpan.System = span.System
+	}
+	if len(span.ProfileID) > 0 {
+		exSpan.ProfileID = span.ProfileID
 	}
 
 	for key, timestamp := range span.Timeline {

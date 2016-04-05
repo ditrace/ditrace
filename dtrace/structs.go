@@ -53,7 +53,6 @@ type Trace struct {
 	Children  map[string]SpanMap
 	Spans     SpanMap
 	Timestamp time.Time
-	System    string
 	ProfileID string
 	Root      *Span
 	Completed bool

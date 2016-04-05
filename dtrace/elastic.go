@@ -55,7 +55,7 @@ func (trace *Trace) GetESDocuments() []*Document {
 		timestamp := root.Timeline.get(trace.Timestamp, "cs", "sr")
 		doc.Fields["timestamp"] = timestamp
 		doc.Fields["id"] = trace.ID
-		doc.Fields["system"] = trace.System
+		doc.Fields["system"] = root.System
 		doc.Fields["duration"] = root.Annotations.get(-1, "cd", "sd")
 		if len(trace.ProfileID) > 0 {
 			doc.Fields["profileid"] = trace.ProfileID

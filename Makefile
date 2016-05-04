@@ -6,7 +6,11 @@ default: prepare test build
 
 build:
 	mkdir -p build/root/usr/bin/ 
-	go build -ldflags "-X main.Version=$(VERSION)-$(RELEASE)" -o build/root/usr/bin/ditrace
+	go build -ldflags "-X main.version=$(VERSION)-$(RELEASE)" -o build/root/usr/bin/ditrace
+
+build_windows:
+	mkdir -p build
+	go build -ldflags "-X main.version=$(VERSION)-$(RELEASE)" -o build/ditrace.exe
 
 test: clean prepare
 	go get github.com/onsi/ginkgo/ginkgo

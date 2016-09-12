@@ -212,7 +212,7 @@ func loadBalancer(spansChannel chan *Span, toES chan *Document, config *Config) 
 				select {
 				case span, ok := <-ch:
 					if !ok {
-						traceMap.Collect(0, 0, toES)
+						traceMap = traceMap.Collect(0, 0, toES)
 						return
 					}
 					traceMap.Put(span)

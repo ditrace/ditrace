@@ -101,7 +101,7 @@ var _ = Describe("DTrace", func() {
 
 			It("should not be collected too early", func() {
 				traceMap.Put(span)
-				traceMap.Collect(time.Second*10, time.Second*10, make(chan *dtrace.Document))
+				traceMap = traceMap.Collect(time.Second*10, time.Second*10, make(chan *dtrace.Document))
 				Expect(len(traceMap)).To(Equal(1))
 			})
 		})
@@ -160,13 +160,13 @@ var _ = Describe("DTrace", func() {
 
 			It("should be wasted on timeout", func() {
 				traceMap.Put(span)
-				traceMap.Collect(0, 0, toES)
+				traceMap = traceMap.Collect(0, 0, toES)
 				Expect(len(traceMap)).To(Equal(0))
 			})
 
 			It("should be waited for complete", func() {
 				traceMap.Put(span)
-				traceMap.Collect(0, time.Minute, toES)
+				traceMap = traceMap.Collect(0, time.Minute, toES)
 				Expect(len(traceMap)).To(Equal(1))
 			})
 		})

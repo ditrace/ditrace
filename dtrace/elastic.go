@@ -97,32 +97,32 @@ func (trace *Trace) GetESDocuments() []*Document {
 }
 
 // Collect completed traces and cleanout uncompleted
-func (traceMap TraceMap) Collect(minTTL, maxTTL time.Duration, toES chan *Document) {
+func (traceMap TraceMap) Collect(minTTL, maxTTL time.Duration, toES chan *Document) TraceMap {
 	now := time.Now()
 
 	defer metrics.FlushTimer.Update(time.Since(now))
 	defer atomic.AddInt64(&metrics.TracesPending, int64(len(traceMap)))
 
 	var (
-		waste       []string
 		completed   int64
 		uncompleted int64
+		nextGenerationTraceMap = make(TraceMap)
 	)
 	for traceID, trace := range traceMap {
 		if trace.Timestamp.Add(minTTL).After(now) {
+			nextGenerationTraceMap[traceID] = trace
 			continue
 		}
 		if !trace.Completed {
 			if trace.Timestamp.Add(maxTTL).After(now) {
+				nextGenerationTraceMap[traceID] = trace
 				continue
 			}
-			waste = append(waste, traceID)
 			uncompleted++
 			continue
 		}
 		completed++
 		documents := trace.GetESDocuments()
-		waste = append(waste, traceID)
 		for _, doc := range documents {
 			toES <- doc
 		}
@@ -130,13 +130,7 @@ func (traceMap TraceMap) Collect(minTTL, maxTTL time.Duration, toES chan *Docume
 
 	atomic.AddInt64(&metrics.TracesCompleted, completed)
 	atomic.AddInt64(&metrics.TracesUncompleted, uncompleted)
-
-	if len(waste) == 0 {
-		return
-	}
-	for _, wasteID := range waste {
-		delete(traceMap, wasteID)
-	}
+	return nextGenerationTraceMap
 }
 
 func elasticSender(ch chan *Document, urls []string, bulkSize int, interval time.Duration) {

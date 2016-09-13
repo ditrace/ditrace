@@ -218,7 +218,7 @@ func loadBalancer(spansChannel chan *Span, toES chan *Document, config *Config) 
 					traceMap.Put(span)
 				case <-timer.C:
 					timer = time.NewTimer(time.Second * 10)
-					traceMap.Collect(time.Second*time.Duration(config.MinTTL), time.Second*time.Duration(config.MaxTTL), toES)
+					traceMap = traceMap.Collect(time.Second*time.Duration(config.MinTTL), time.Second*time.Duration(config.MaxTTL), toES)
 				}
 			}
 		}(ch)

@@ -12,4 +12,5 @@ type Config struct {
 	MyReplicaIndex    int      `yaml:"my_replica_index"`
 	MinTTL            int      `yaml:"min_ttl"`
 	MaxTTL            int      `yaml:"max_ttl"`
+	MaxSpansPerTrace  int      `yaml:"max_spans_per_trace"`
 }

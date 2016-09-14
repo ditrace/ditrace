@@ -84,7 +84,7 @@ var _ = Describe("DTrace", func() {
 
 			It("should be aggregated correctly", func() {
 				trace := traceMap.Put(span)
-				Expect(trace.Root.Annotations["sd"]).To(Equal(int64(589400)))
+				Expect(trace.Root.Duration()).To(Equal(int64(589400)))
 				Expect(trace.Completed).To(BeTrue())
 				Expect(trace.Spans["spanid"].Annotations["url"]).To(Equal("/url/<hex>"))
 				Expect(trace.Spans["spanid"].Annotations["rawurl"]).To(Equal("/url/22345200-abe8-4f60-90c8-0d43c5f6c0f6/"))

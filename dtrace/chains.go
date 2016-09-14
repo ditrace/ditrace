@@ -57,7 +57,7 @@ func (trace *Trace) GetChains(rootSpanID string) ([]*Span, []*Chain, error) {
 				Prefix: getPath(trace.Spans, item.Prefix),
 				Level:  item.Level,
 			}
-			chain.Duration = itemSpan.Annotations.get(int64(0), "cd", "sd").(int64)
+			chain.Duration = itemSpan.Duration()
 			chains = append(chains, chain)
 			levelIncrement = 1
 			prefixAddition = item.Chain

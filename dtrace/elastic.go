@@ -56,7 +56,7 @@ func (trace *Trace) GetESDocuments() []*Document {
 		doc.Fields["timestamp"] = timestamp
 		doc.Fields["id"] = trace.ID
 		doc.Fields["system"] = root.System
-		doc.Fields["duration"] = root.Annotations.get(-1, "cd", "sd")
+		doc.Fields["duration"] = root.Duration()
 		if len(trace.ProfileID) > 0 {
 			doc.Fields["profileid"] = trace.ProfileID
 		}
@@ -81,6 +81,8 @@ func (trace *Trace) GetESDocuments() []*Document {
 			for key, value := range span.Annotations {
 				ds[key] = value
 			}
+			ds["cd"], ds["sd"], ds["td"] = span.Durations()
+
 			if len(span.Timeline) > 0 {
 				timeline := make(map[string]string)
 				for key, timestamp := range span.Timeline {
@@ -104,8 +106,8 @@ func (traceMap TraceMap) Collect(minTTL, maxTTL time.Duration, toES chan *Docume
 	defer atomic.AddInt64(&metrics.TracesPending, int64(len(traceMap)))
 
 	var (
-		completed   int64
-		uncompleted int64
+		completed              int64
+		uncompleted            int64
 		nextGenerationTraceMap = make(TraceMap)
 	)
 	for traceID, trace := range traceMap {

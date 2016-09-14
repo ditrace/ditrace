@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	hexRe = regexp.MustCompile("(([0-9a-fA-F\\-][0-9a-fA-F\\-]){2}){4,}")
+	hexRe     = regexp.MustCompile("(([0-9a-fA-F\\-][0-9a-fA-F\\-]){2}){4,}")
 	numbersRe = regexp.MustCompile("\\d+")
 )
 
@@ -20,7 +20,7 @@ func (traceMap TraceMap) Put(span *Span) *Trace {
 	if len(span.ProfileID) > 0 {
 		trace.ProfileID = span.ProfileID
 	}
-	
+
 	span.Revision = span.revision()
 
 	exSpan := trace.Spans.getOrCreate(span.ID)
@@ -43,7 +43,7 @@ func (traceMap TraceMap) Put(span *Span) *Trace {
 
 	for key, value := range span.Annotations {
 		lowerCaseKey := strings.ToLower(key)
-		if _, exists := exSpan.Annotations[lowerCaseKey]; !exists || span.isClient() || span.Revision > exSpan.Revision{
+		if _, exists := exSpan.Annotations[lowerCaseKey]; !exists || span.isClient() || span.Revision > exSpan.Revision {
 			exSpan.Annotations[lowerCaseKey] = value
 			if strValue, ok := value.(string); ok {
 				lowerCaseValue := strings.ToLower(strValue)
@@ -60,18 +60,6 @@ func (traceMap TraceMap) Put(span *Span) *Trace {
 	cr := exSpan.getTimestamp("cr")
 	sr := exSpan.getTimestamp("sr")
 	ss := exSpan.getTimestamp("ss")
-
-	if cs != nil && cr != nil {
-		exSpan.Annotations["cd"] = cr.Sub(*cs).Nanoseconds() / 1000 // client duration
-	}
-
-	if ss != nil && sr != nil {
-		exSpan.Annotations["sd"] = ss.Sub(*sr).Nanoseconds() / 1000 // server duration
-	}
-
-	if cs != nil && cr != nil && ss != nil && sr != nil {
-		exSpan.Annotations["td"] = exSpan.Annotations["cd"].(int64) - exSpan.Annotations["cd"].(int64) // transfer duration
-	}
 
 	if len(exSpan.ParentSpanID) == 0 && len(trace.Roots) == 0 {
 		trace.Root = exSpan

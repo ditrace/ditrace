@@ -81,6 +81,7 @@ func (traceMap TraceMap) getOrCreate(traceid string) *Trace {
 		}
 		traceMap[traceid] = trace
 	}
+
 	return trace
 }
 
@@ -173,6 +174,44 @@ func (annotations SpanAnnotations) get(defaultValue interface{}, keys ...string)
 		}
 	}
 	return defaultValue
+}
+
+// Duration of server or client request
+func (span *Span) Duration() int64 {
+	cd, sd, _ := span.Durations()
+	switch {
+	case cd != 0:
+		return cd
+	case sd != 0:
+		return sd
+	}
+	return 0
+}
+
+// Durations of Span lifecycle
+func (span *Span) Durations() (int64, int64, int64) {
+	cs := span.getTimestamp("cs")
+	cr := span.getTimestamp("cr")
+	sr := span.getTimestamp("sr")
+	ss := span.getTimestamp("ss")
+
+	var cd int64
+	var sd int64
+	var td int64
+
+	if cs != nil && cr != nil {
+		cd = cr.Sub(*cs).Nanoseconds() / 1000 // client duration
+	}
+
+	if ss != nil && sr != nil {
+		sd = ss.Sub(*sr).Nanoseconds() / 1000 // server duration
+	}
+
+	if cs != nil && cr != nil && ss != nil && sr != nil {
+		td = cd - sd // transfer duration
+	}
+
+	return cd, sd, td
 }
 
 func (timeline SpanTimeline) get(defaultValue time.Time, keys ...string) time.Time {

@@ -99,7 +99,7 @@ func (trace *Trace) GetESDocuments() []*Document {
 }
 
 // Collect completed traces and cleanout uncompleted
-func (traceMap TraceMap) Collect(minTTL, maxTTL time.Duration, toES chan *Document) TraceMap {
+func (traceMap TraceMap) Collect(minTTL, maxTTL time.Duration, maxSpansPerTrace int, toES chan *Document) TraceMap {
 	now := time.Now()
 
 	defer metrics.FlushTimer.Update(time.Since(now))
@@ -111,22 +111,27 @@ func (traceMap TraceMap) Collect(minTTL, maxTTL time.Duration, toES chan *Docume
 		nextGenerationTraceMap = make(TraceMap)
 	)
 	for traceID, trace := range traceMap {
-		if trace.Timestamp.Add(minTTL).After(now) {
+		spansCount := len(trace.Spans)
+		if spansCount > maxSpansPerTrace {
+			log.Warningf("Trace %s spans limit %d overflow", traceID, maxSpansPerTrace)
+		}
+		if trace.Timestamp.Add(minTTL).After(now) && spansCount <= maxSpansPerTrace {
 			nextGenerationTraceMap[traceID] = trace
 			continue
 		}
-		if !trace.Completed {
-			if trace.Timestamp.Add(maxTTL).After(now) {
+		if trace.Completed {
+			completed++
+			documents := trace.GetESDocuments()
+			for _, doc := range documents {
+				toES <- doc
+			}
+		} else {
+			if trace.Timestamp.Add(maxTTL).After(now) && spansCount <= maxSpansPerTrace {
 				nextGenerationTraceMap[traceID] = trace
 				continue
+			} else {
+				uncompleted++
 			}
-			uncompleted++
-			continue
-		}
-		completed++
-		documents := trace.GetESDocuments()
-		for _, doc := range documents {
-			toES <- doc
 		}
 	}
 

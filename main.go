@@ -54,6 +54,7 @@ func getConfig(configLocation string) (*config, error) {
 			MyReplicaIndex:    0,
 			MinTTL:            10,
 			MaxTTL:            120,
+			MaxSpansPerTrace:  1000,
 		},
 	}
 

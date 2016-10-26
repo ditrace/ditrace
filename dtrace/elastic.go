@@ -215,7 +215,7 @@ func sendBulk(esClient ESClient, documents []*Document) {
 			log.Warningf("Can not decode response error: %s", err)
 			continue
 		}
-		log.Warningf("Fail details #%d: %s", i, string(response))
+		log.Warningf("Fail details [#%d] index [%s] %s", i, res.Index, string(response))
 	}
 }
 

@@ -12,12 +12,11 @@ before_install:
   - go get github.com/onsi/ginkgo/ginkgo
   - go get github.com/onsi/gomega
 script:
-    - go vet -x ./...
-    - golint ./...
-    - cd tests
-    - ginkgo -r --randomizeAllSpecs -cover --failOnPending -coverpkg=../dtrace --trace --race
-    - gover
-    - goveralls -coverprofile=gover.coverprofile -service=travis-ci
+  - golint ./...
+  - cd tests
+  - ginkgo -r --randomizeAllSpecs -cover --failOnPending -coverpkg=../dtrace --trace --race
+  - gover
+  - goveralls -coverprofile=gover.coverprofile -service=travis-ci
 notifications:
   webhooks:
     urls:

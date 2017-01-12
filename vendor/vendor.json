@@ -33,6 +33,12 @@
 			"tree": true
 		},
 		{
+			"checksumSHA1": "KAzbLjI9MzW2tjfcAsK75lVRp6I=",
+			"path": "github.com/rcrowley/go-metrics",
+			"revision": "1f30fe9094a513ce4c700b9a54458bbb0c96996c",
+			"revisionTime": "2016-11-28T21:05:44Z"
+		},
+		{
 			"checksumSHA1": "YeBq0fA5AKW4A5g0XXC0gSoIlfk=",
 			"path": "github.com/stathat/go",
 			"revision": "74669b9f388d9d788c97399a0824adbfee78400e",

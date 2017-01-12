@@ -18,7 +18,7 @@ var (
 
 	activeESRequests   = metrics.NewRegisteredGauge("es.requests.active", metrics.DefaultRegistry)
 	failedESRequests   = metrics.NewRegisteredMeter("es.requests.failed", metrics.DefaultRegistry)
-	failedESTraces = metrics.NewRegisteredMeter("es.traces.failed", metrics.DefaultRegistry)
+	failedESTraces     = metrics.NewRegisteredMeter("es.traces.failed", metrics.DefaultRegistry)
 	activeHTTPRequests = metrics.NewRegisteredGauge("http.requests.active", metrics.DefaultRegistry)
 	spansReceived      = metrics.NewRegisteredMeter("http.spans.received", metrics.DefaultRegistry)
 	tracesPending      = metrics.NewRegisteredGauge("http.traces.pending", metrics.DefaultRegistry)
@@ -33,7 +33,7 @@ var (
 
 	// FailedESRequests store failed ES requests counter
 	FailedESRequests int64
-	
+
 	// FailedESTraces store failed ES trace documents
 	FailedESTraces int64
 

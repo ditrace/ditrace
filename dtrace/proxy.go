@@ -2,12 +2,12 @@ package dtrace
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"sync"
 	"time"
-	"fmt"
 )
 
 const xProxyHeader string = "X-DTrace-Proxy"

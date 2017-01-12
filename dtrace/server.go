@@ -82,8 +82,8 @@ func Listen(terminate chan os.Signal, config *Config, started chan bool) {
 			if err != nil {
 				log.Warningf("Handle request failed [%s %s %s %d %f]: %s.", r.Method, r.RequestURI, remoteAddress, code, elapsed.Seconds(), err)
 				w.WriteHeader(code)
-				if _, err := fmt.Fprintln(w, err); err != nil {
-					log.Errorf("Failed to sending response: %s", err)
+				if _, errWrite := fmt.Fprintln(w, err); errWrite != nil {
+					log.Errorf("Failed to sending response: %s", errWrite)
 				}
 				return
 			}
@@ -157,8 +157,8 @@ func HandleRequest(config *Config, r *http.Request, toProxy, toLoadBalancer chan
 				if len(lineBytes) == 0 {
 					continue
 				}
-				if err := json.Unmarshal(lineBytes, &span); err != nil {
-					return 400, count, fmt.Errorf("Can not decode line [%s]: %s", string(lineBytes), err)
+				if errUnmarshal := json.Unmarshal(lineBytes, &span); errUnmarshal != nil {
+					return 400, count, fmt.Errorf("Can not decode line [%s]: %s", string(lineBytes), errUnmarshal)
 				}
 
 				span.RawString = string(lineBytes)

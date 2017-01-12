@@ -207,12 +207,11 @@ var _ = Describe("DTrace", func() {
 		})
 
 		Context("partial span information", func() {
-			var trace *dtrace.Trace
 			BeforeEach(func() {
 				for _, j := range testPartialJsons {
 					var span dtrace.Span
 					json.Unmarshal([]byte(j), &span)
-					trace = traceMap.Put(&span)
+					_ = traceMap.Put(&span)
 				}
 			})
 			It("should be aggregated correctly", func() {
@@ -445,11 +444,11 @@ var _ = Describe("DTrace", func() {
 			go func(ch chan *dtrace.Span) {
 				defer wg.Done()
 				for {
-					span, ok := <-ch
+					spanReceived, ok := <-ch
 					if !ok {
 						break
 					}
-					spans = append(spans, span)
+					spans = append(spans, spanReceived)
 				}
 			}(toLoadBalancer)
 
@@ -529,7 +528,6 @@ var _ = Describe("DTrace", func() {
 				ElasticSearch:  []string{"http://es1:9200", "http://es2:9200"},
 				Address:        ":8080",
 			}
-			spans      []*dtrace.Span
 			wg         sync.WaitGroup
 			httpClient *mockHTTPClient
 			esClient   *mockESClient
@@ -548,7 +546,6 @@ var _ = Describe("DTrace", func() {
 				return esClient, nil
 			}
 			terminate = make(chan os.Signal)
-			spans = make([]*dtrace.Span, 0)
 			started := make(chan bool)
 			wg.Add(1)
 			go func() {
@@ -651,8 +648,8 @@ func fileFeed(filename string, traceMap dtrace.TraceMap) *dtrace.Trace {
 		if err == nil {
 			if len(strings.Trim(string(line), " ")) > 0 {
 				var span dtrace.Span
-				err := json.Unmarshal(line, &span)
-				Expect(err).ShouldNot(HaveOccurred())
+				errUnmarshal := json.Unmarshal(line, &span)
+				Expect(errUnmarshal).ShouldNot(HaveOccurred())
 				trace = traceMap.Put(&span)
 			}
 			continue

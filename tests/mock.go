@@ -2,8 +2,8 @@ package tests
 
 import (
 	"net/http"
-	"sync/atomic"
 	"sync"
+	"sync/atomic"
 
 	"github.com/ditrace/ditrace/dtrace"
 	"gopkg.in/olivere/elastic.v3"
@@ -12,7 +12,7 @@ import (
 type mockHTTPClient struct {
 	requestCount int32
 	lastRequest  map[string]*http.Request
-	mutex sync.Mutex
+	mutex        sync.Mutex
 }
 
 func (proxyClient *mockHTTPClient) Send(req *http.Request) error {

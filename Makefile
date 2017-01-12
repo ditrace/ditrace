@@ -17,7 +17,7 @@ test: clean prepare
 	ginkgo --randomizeAllSpecs --randomizeSuites --failOnPending --trace --progress tests
 
 prepare:
-	go get kardianos/govendor
+	go get github.com/kardianos/govendor
 	govendor sync
 
 rpm: build

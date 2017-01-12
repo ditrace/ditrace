@@ -5,7 +5,7 @@ VENDOR := "SKB Kontur"
 default: prepare test build
 
 build:
-	mkdir -p build/root/usr/bin/ 
+	mkdir -p build/root/usr/bin/
 	go build -ldflags "-X main.version=$(VERSION)-$(RELEASE)" -o build/root/usr/bin/ditrace
 
 build_windows:
@@ -17,8 +17,8 @@ test: clean prepare
 	ginkgo --randomizeAllSpecs --randomizeSuites --failOnPending --trace --progress tests
 
 prepare:
-	go get github.com/sparrc/gdm
-	gdm restore
+	go get kardianos/govendor
+	govendor sync
 
 rpm: build
 	fpm -t rpm \

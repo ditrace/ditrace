@@ -1,0 +1,55 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "8/Q1JbAHUmL4sDURLq6yron4K/I=",
+			"path": "github.com/cyberdelia/go-metrics-graphite",
+			"revision": "7e54b5c2aa6eaff4286c44129c3def899dff528c",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "kBeNcaKk56FguvPSUCEaH6AxpRc=",
+			"path": "github.com/golang/protobuf/proto",
+			"revision": "8ee79997227bf9b34611aee7946ae64735e6fd93",
+			"revisionTime": "2016-11-17T03:31:26Z"
+		},
+		{
+			"checksumSHA1": "cqURlpNDX8rLzTexC85v/pZ5qXc=",
+			"path": "github.com/onsi/ginkgo",
+			"revision": "e43390e35a4a88f3f95d5ddf9055efb7a1170469",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "/KrzketkbKiUsN5Lp6BATD4hh6E=",
+			"path": "github.com/onsi/gomega",
+			"revision": "0fe204460da2c8fa1babcaac196e694de8f1aaa1",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "lpBWW/2eW9ZH+Dzw0AQd9E5YGl4=",
+			"path": "github.com/op/go-logging",
+			"revision": "d2e44aa77b7195c0ef782189985dd8550e22e4de",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "YeBq0fA5AKW4A5g0XXC0gSoIlfk=",
+			"path": "github.com/stathat/go",
+			"revision": "74669b9f388d9d788c97399a0824adbfee78400e",
+			"revisionTime": "2016-07-15T15:55:40Z"
+		},
+		{
+			"checksumSHA1": "afB55ZnPdNUJUxx8zBekNRPx76k=",
+			"path": "gopkg.in/olivere/elastic.v3",
+			"revision": "021043c88c79358dba55c1cb74c841affff6949e",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "Ww6wiSKdA8LwxoJz4DNUF+crH4g=",
+			"path": "gopkg.in/yaml.v2",
+			"revision": "f7716cbe52baa25d2e9b0d0da546fcf909fc16b4",
+			"tree": true
+		}
+	],
+	"rootPath": "github.com/ditrace/ditrace"
+}

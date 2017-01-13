@@ -277,14 +277,14 @@ var _ = Describe("DTrace", func() {
 
 				Expect(containsPath(chains, "s0")).To(Equal(1))
 				Expect(containsPath(chains, "s0->s1-w")).To(Equal(1))
-				Expect(containsPath(chains, "s1-w->s2")).To(Equal(2))
+				Expect(containsPath(chains, "s1->s2")).To(Equal(2))
 				Expect(containsPath(chains, "s2->s3")).To(Equal(1))
 				Expect(containsPath(chains, "s2->s4")).To(Equal(1))
 
 				Expect(containsPrefix(chains, "")).To(Equal(1))
 				Expect(containsPrefix(chains, "s0")).To(Equal(1))
 				Expect(containsPrefix(chains, "s0->s0->s1-w")).To(Equal(2))
-				Expect(containsPrefix(chains, "s0->s0->s1-w->s1-w->s2")).To(Equal(2))
+				Expect(containsPrefix(chains, "s0->s0->s1-w->s1->s2")).To(Equal(2))
 
 				Expect(chains[0].Level).To(Equal(0))
 				Expect(chains[1].Level).To(Equal(1))
@@ -292,6 +292,49 @@ var _ = Describe("DTrace", func() {
 				Expect(chains[3].Level).To(Equal(2))
 				Expect(chains[4].Level).To(Equal(3))
 				Expect(chains[5].Level).To(Equal(3))
+			})
+		})
+
+		Context("chain calculation targetid patching", func() {
+			var trace *dtrace.Trace
+			var chains []*dtrace.Chain
+			BeforeEach(func() {
+				jsons := []string{
+					`{"traceid": "0", "spanid": "0", "annotations": {"targetid": "root"}}`,
+					`{"traceid": "0", "spanid": "1", "parentspanid": "0", "annotations": {"targetid": "wrapper", "wrapper": ""}}`,
+					`{"traceid": "0", "spanid": "2", "parentspanid": "1", "annotations": {}}`,
+					`{"traceid": "0", "spanid": "3", "parentspanid": "1", "annotations": {"host": "host"}}`,
+					`{"traceid": "0", "spanid": "4", "parentspanid": "1", "annotations": {"host": "host", "targethost": "targethost"}}`,
+					`{"traceid": "0", "spanid": "5", "parentspanid": "1", "annotations": {"host": "host", "targethost": "targethost", "targetid": "targetid"}}`,
+					`{"traceid": "0", "spanid": "6", "parentspanid": "2", "annotations": {"targetid": "leaf"}}`,
+					`{"traceid": "0", "spanid": "7", "parentspanid": "3", "annotations": {"targetid": "leaf"}}`,
+					`{"traceid": "0", "spanid": "8", "parentspanid": "4", "annotations": {"targetid": "leaf"}}`,
+					`{"traceid": "0", "spanid": "9", "parentspanid": "5", "annotations": {"targetid": "leaf"}}`,
+					`{"traceid": "0", "spanid": "10", "parentspanid": "0", "annotations": {"targetid": "nonwrapper"}}`,
+					`{"traceid": "0", "spanid": "11", "parentspanid": "10", "annotations": {}}`,
+					`{"traceid": "0", "spanid": "12", "parentspanid": "11", "annotations": {"targetid": "leaf"}}`,
+				}
+				for _, j := range jsons {
+					var span dtrace.Span
+					json.Unmarshal([]byte(j), &span)
+					trace = traceMap.Put(&span)
+				}
+				_, chains, _ = trace.GetChains("0")
+			})
+
+			It("should inherit from wrapper if no local annotations are available", func() {
+				Expect(containsPath(chains, "wrapper->leaf")).To(Equal(1))
+			})
+
+			It("should not inherit and instead choose appropriate local annotation", func() {
+				Expect(containsPath(chains, "host->leaf")).To(Equal(1))
+				Expect(containsPath(chains, "targethost->leaf")).To(Equal(1))
+				Expect(containsPath(chains, "targetid->leaf")).To(Equal(1))
+			})
+
+			It("should not inherit from non-wrapper", func() {
+				Expect(chains).To(HaveLen(1))
+				Expect(containsPath(chains, "root->nonwrapper->unknown->leaf")).To(Equal(1))
 			})
 		})
 

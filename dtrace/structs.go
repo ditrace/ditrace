@@ -150,7 +150,10 @@ func (span *Span) getTimestamp(name string) *time.Time {
 
 func (trace *Trace) patchTargetID(span *Span) {
 	if _, exists := span.Annotations["targetid"]; !exists {
-		span.Annotations["targetid"] = span.Annotations.get("unknown", "host")
+		span.Annotations["targetid"] = span.Annotations.get("unknown", "targethost", "host")
+	}
+	if targetid, _ := span.Annotations["targetid"]; targetid != "unknown" {
+		return
 	}
 	if len(span.ParentSpanID) == 0 {
 		return

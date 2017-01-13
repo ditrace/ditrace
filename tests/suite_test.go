@@ -89,7 +89,7 @@ var _ = Describe("DTrace", func() {
 				Expect(trace.Spans["spanid"].Annotations["url"]).To(Equal("/url/<hex>"))
 				Expect(trace.Spans["spanid"].Annotations["rawurl"]).To(Equal("/url/22345200-abe8-4f60-90c8-0d43c5f6c0f6/"))
 				documents := trace.GetESDocuments()
-				Expect(len(documents)).To(Equal(1))
+				Expect(documents).To(HaveLen(1))
 				Expect(documents[0].Index).To(Equal("traces-2015.07.24"))
 				Expect(documents[0].Fields["system"]).To(Equal("system"))
 				Expect(documents[0].Fields["duration"]).To(Equal(int64(589400)))
@@ -102,7 +102,7 @@ var _ = Describe("DTrace", func() {
 			It("should not be collected too early", func() {
 				traceMap.Put(span)
 				traceMap = traceMap.Collect(time.Second*10, time.Second*10, 1000, make(chan *dtrace.Document))
-				Expect(len(traceMap)).To(Equal(1))
+				Expect(traceMap).To(HaveLen(1))
 			})
 		})
 
@@ -161,19 +161,19 @@ var _ = Describe("DTrace", func() {
 			It("should be wasted on timeout", func() {
 				traceMap.Put(span)
 				traceMap = traceMap.Collect(0, 0, 1000, toES)
-				Expect(len(traceMap)).To(Equal(0))
+				Expect(traceMap).To(HaveLen(0))
 			})
 
 			It("should be waited for complete", func() {
 				traceMap.Put(span)
 				traceMap = traceMap.Collect(0, time.Minute, 1000, toES)
-				Expect(len(traceMap)).To(Equal(1))
+				Expect(traceMap).To(HaveLen(1))
 			})
 
 			It("should cleanup overflow trace", func() {
 				traceMap.Put(span)
 				traceMap = traceMap.Collect(0, time.Minute, 0, toES)
-				Expect(len(traceMap)).To(Equal(0))
+				Expect(traceMap).To(HaveLen(0))
 			})
 		})
 
@@ -187,10 +187,10 @@ var _ = Describe("DTrace", func() {
 				documents := trace.GetESDocuments()
 				spans := documents[0].Fields["spans"].([]map[string]interface{})
 				chains := documents[0].Fields["chains"].([]*dtrace.Chain)
-				Expect(len(documents)).To(Equal(1))
+				Expect(documents).To(HaveLen(1))
 				Expect(documents[0].Fields["timestamp"].(time.Time).UnixNano()).To(Equal(int64(1438263809678249600)))
-				Expect(len(spans)).To(Equal(228))
-				Expect(len(chains)).To(Equal(225))
+				Expect(spans).To(HaveLen(228))
+				Expect(chains).To(HaveLen(225))
 			})
 		})
 
@@ -202,7 +202,7 @@ var _ = Describe("DTrace", func() {
 			It("should be converted to multiple ES documents", func() {
 				Expect(traceMap["8695051faea44d9694fab3c23c2c32e8"].Spans["xxx-xxx-xx-x"].Annotations["targetid"]).To(Equal("task"))
 				documents := trace.GetESDocuments()
-				Expect(len(documents)).To(Equal(2))
+				Expect(documents).To(HaveLen(2))
 			})
 		})
 
@@ -235,8 +235,8 @@ var _ = Describe("DTrace", func() {
 				spans, chains, err := trace.GetChains("0")
 				Expect(err).ShouldNot(HaveOccurred())
 
-				Expect(len(spans)).To(Equal(1))
-				Expect(len(chains)).To(Equal(1))
+				Expect(spans).To(HaveLen(1))
+				Expect(chains).To(HaveLen(1))
 
 				Expect(containsPath(chains, "s0")).To(Equal(1))
 
@@ -269,8 +269,8 @@ var _ = Describe("DTrace", func() {
 				spans, chains, err := trace.GetChains("0")
 				Expect(err).ShouldNot(HaveOccurred())
 
-				Expect(len(spans)).To(Equal(8))
-				Expect(len(chains)).To(Equal(6))
+				Expect(spans).To(HaveLen(8))
+				Expect(chains).To(HaveLen(6))
 
 				Expect(spans[0].ParentSpanID).To(Equal(""))
 				Expect(spans[1].ParentSpanID).To(Equal("0"))
@@ -333,7 +333,6 @@ var _ = Describe("DTrace", func() {
 			})
 
 			It("should not inherit from non-wrapper", func() {
-				Expect(chains).To(HaveLen(1))
 				Expect(containsPath(chains, "root->nonwrapper->unknown->leaf")).To(Equal(1))
 			})
 		})
@@ -356,8 +355,8 @@ var _ = Describe("DTrace", func() {
 				spans, chains, err := trace.GetChains("0")
 				Expect(err).ShouldNot(HaveOccurred())
 
-				Expect(len(spans)).To(Equal(3))
-				Expect(len(chains)).To(Equal(3))
+				Expect(spans).To(HaveLen(3))
+				Expect(chains).To(HaveLen(3))
 
 				Expect(containsPath(chains, "s0")).To(Equal(1))
 				Expect(containsPath(chains, "s0->s1")).To(Equal(1))
@@ -420,7 +419,7 @@ var _ = Describe("DTrace", func() {
 					Expect(count).To(Equal(1))
 				})
 				It("should parse span correctly", func() {
-					Expect(len(spans)).To(Equal(1))
+					Expect(spans).To(HaveLen(1))
 					Expect(spans[0].IsRoot()).To(Equal(false))
 					Expect(spans[0].ParentSpanID).To(Equal(""))
 					Expect(spans[0].ID).To(Equal("549f7d28"))
@@ -507,7 +506,7 @@ var _ = Describe("DTrace", func() {
 			toProxy <- span
 			close(toProxy)
 			wg.Wait()
-			Expect(len(spans)).To(Equal(1))
+			Expect(spans).To(HaveLen(1))
 		})
 
 		It("should proxy request to replica1", func() {
@@ -515,7 +514,7 @@ var _ = Describe("DTrace", func() {
 			toProxy <- span
 			close(toProxy)
 			wg.Wait()
-			Expect(len(spans)).To(Equal(0))
+			Expect(spans).To(HaveLen(0))
 			Expect(httpClient.requestCount).To(Equal(int32(1)))
 			Expect(httpClient.lastRequest["system"].URL.String()).To(Equal("http://replica1:5678/spans?system=system"))
 			Expect(httpClient.lastRequest["system"].URL.Path).To(Equal("/spans"))
@@ -528,7 +527,7 @@ var _ = Describe("DTrace", func() {
 			toProxy <- span
 			close(toProxy)
 			wg.Wait()
-			Expect(len(spans)).To(Equal(0))
+			Expect(spans).To(HaveLen(0))
 			Expect(httpClient.requestCount).To(Equal(int32(1)))
 			Expect(httpClient.lastRequest["system"].URL.String()).To(Equal("https://replica3/spans?system=system"))
 		})
@@ -553,7 +552,7 @@ var _ = Describe("DTrace", func() {
 				toProxy <- span2
 				close(toProxy)
 				wg.Wait()
-				Expect(len(spans)).To(Equal(0))
+				Expect(spans).To(HaveLen(0))
 				Expect(httpClient.requestCount).To(Equal(int32(2)))
 				Expect(httpClient.lastRequest["system"].URL.String()).To(Equal("https://replica3/spans?system=system"))
 			})

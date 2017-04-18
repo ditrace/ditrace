@@ -15,7 +15,7 @@ build_windows:
 test_travis: clean prepare prepare_test
 	golint ./...
 	cd tests
-	ginkgo -r --randomizeAllSpecs -cover --failOnPending -coverpkg=../dtrace --trace --race
+	ginkgo -r --randomizeAllSpecs -cover --failOnPending -coverpkg=../ditrace --trace --race
 	gover
 	goveralls -coverprofile=gover.coverprofile -service=travis-ci
 

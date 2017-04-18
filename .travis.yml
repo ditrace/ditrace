@@ -2,21 +2,32 @@ language: go
 sudo: false
 go:
   - 1.7
-before_install:
-  - make prepare
-  - go get github.com/axw/gocov/gocov
-  - go get github.com/mattn/goveralls
-  - go get golang.org/x/tools/cmd/cover
-  - go get github.com/modocache/gover
-  - go get github.com/golang/lint/golint
-  - go get github.com/onsi/ginkgo/ginkgo
-  - go get github.com/onsi/gomega
+addons:
+  apt:
+    packages:
+      rpm
+install:
+  - gem install fpm
 script:
-  - golint ./...
-  - cd tests
-  - ginkgo -r --randomizeAllSpecs -cover --failOnPending -coverpkg=../dtrace --trace --race
-  - gover
-  - goveralls -coverprofile=gover.coverprofile -service=travis-ci
+  - make test_travis
+  - make rpm
+
+before_deploy:
+  - export PACKAGE_NAME=$(ls build/ditrace-*.x86_64.rpm | tail -n1)
+deploy:
+  - provider: script
+    script: "curl -sS --fail -F \"uploadfile=@${PACKAGE_NAME}\" -H 'token: ${UPLOAD_TOKEN}' \"${UPLOAD_URL}\""
+    skip_cleanup: true
+    on:
+      branch: master
+      condition: $TRAVIS_GO_VERSION = 1.7
+  - provider: script
+    script: "curl -sS --fail -F \"uploadfile=@${PACKAGE_NAME}\" -H 'token: ${UPLOAD_TOKEN}' \"${UPLOAD_URL}\""
+    skip_cleanup: true
+    on:
+      tags: true
+      condition: $TRAVIS_GO_VERSION = 1.7
+
 notifications:
   webhooks:
     urls:

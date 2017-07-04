@@ -87,7 +87,6 @@ var _ = Describe("DTrace", func() {
 				Expect(trace.Root.Duration()).To(Equal(int64(589400)))
 				Expect(trace.Completed).To(BeTrue())
 				Expect(trace.Spans["spanid"].Annotations["url"]).To(Equal("/url/<hex>"))
-				Expect(trace.Spans["spanid"].Annotations["rawurl"]).To(Equal("/url/22345200-abe8-4f60-90c8-0d43c5f6c0f6/"))
 				documents := trace.GetESDocuments()
 				Expect(documents).To(HaveLen(1))
 				Expect(documents[0].Index).To(Equal("traces-2015.07.24"))

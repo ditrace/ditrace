@@ -48,7 +48,6 @@ func (traceMap TraceMap) Put(span *Span) *Trace {
 			if strValue, ok := value.(string); ok {
 				lowerCaseValue := strings.ToLower(strValue)
 				if lowerCaseKey == "url" {
-					exSpan.Annotations["rawurl"] = strValue
 					strValue = NormalizeURL(lowerCaseValue)
 				}
 				exSpan.Annotations[lowerCaseKey] = strValue
